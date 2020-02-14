@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-import numpy as np
-from scipy.spatial import distance_matrix
 from src.aux_functions import neighbourhood_algorithm
+from sklearn.model_selection import GridSearchCV
+import xgboost as xgb
 
 # 0. DATA LOADING (Previously has been created through creating_data_table.py script).
 df = pd.read_csv('data/sampled_data.csv')
@@ -22,7 +22,7 @@ matrix_distances = neighbourhood_algorithm(df=df_grouped,
 
 # We remove the column 0, which is neighbourhood with other test fields (no real label).
 matrix_distances.drop(axis=1, columns=['0.0'], inplace=True)
-matrix_distances = matrix_distances.rename(columns={"variable":'fid'})
+matrix_distances = matrix_distances.rename(columns={"variable": 'fid'})
 matrix_distances = matrix_distances.fillna(0)
 
 df_grouped['fid'] = df_grouped['fid'].astype(str)
@@ -36,10 +36,14 @@ test = df_grouped.loc[df_grouped.label == 0]
 # Training set is the values of the pixels (from column 5 onwards), whereas label is the column 'label'.
 X_train, y_train = train[train.columns[5:]], train['label']
 
-# Baseline prediction
-model = RandomForestClassifier(n_estimators=500)
-model.fit(X_train.fillna(0), y_train)
+params = {}
+params['learning_rate'] = [0.05]
+params['objective'] = ['reg:squarederror']
+params['max_depth'] = [3]
 
+# GridSearch
+model = xgb.XGBClassifier(learning_rate=0.05, objective='multi:softprob', scoring='neg_log_loss', max_depth=3, verbosity=2)
+model.fit(X_train.fillna(0), y_train, verbose=True)
 
 # 3. GENERATE PREDICTIONS AND SUBMIT
 # Get the predicted probabilities on the pixels columns of test set (columns 5 onwards)
@@ -47,11 +51,13 @@ preds = model.predict_proba(test[test.columns[5:]])
 
 # Create a dataframe with the test Field ID's
 prob_df = pd.DataFrame({
-    'Field_ID':test['fid'].values
+    'Field_ID': test['fid'].values
 })
+
+
 # Rename the label columns to make the submission
 for c in range(1, 8):
-    prob_df['Crop_ID_'+str(c)] = preds[:,c-1]
+    prob_df['Crop_ID_' + str(c)] = preds[:, c - 1]
 
 # Save the submission
 prob_df.to_csv('MLSubmission.csv', index=False)
