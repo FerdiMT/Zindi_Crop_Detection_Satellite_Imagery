@@ -18,15 +18,20 @@ matrix_distances = neighbourhood_algorithm(df=df_grouped,
                                            label_col='label',
                                            x_coord_col='row_loc',
                                            y_coord_col='col_loc',
-                                           threshold=100)
+                                           threshold=50)
 
 # We remove the column 0, which is neighbourhood with other test fields (no real label).
 matrix_distances.drop(axis=1, columns=['0.0'], inplace=True)
 matrix_distances = matrix_distances.rename(columns={"variable": 'fid'})
 matrix_distances = matrix_distances.fillna(0)
 
+# Set the number of neighbours in percentages.
+percentage_distances = matrix_distances.set_index('fid')
+percentage_distances = percentage_distances.div(percentage_distances.sum(axis=1), axis=0)
+percentage_distances.reset_index(inplace=True)
+
 df_grouped['fid'] = df_grouped['fid'].astype(str)
-df_grouped = pd.merge(df_grouped, matrix_distances, left_on='fid', right_on='fid', how='left')
+df_grouped = pd.merge(df_grouped, percentage_distances, left_on='fid', right_on='fid', how='left')
 
 # Separate between train and test
 train = df_grouped.loc[df_grouped.label != 0]
