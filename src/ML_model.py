@@ -3,6 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from src.aux_functions import neighbourhood_algorithm
 from sklearn.model_selection import GridSearchCV
 import xgboost as xgb
+from sklearn.preprocessing import StandardScaler
 
 # 0. DATA LOADING (Previously has been created through creating_data_table.py script).
 df = pd.read_csv('data/sampled_data.csv')
@@ -29,13 +30,26 @@ matrix_distances = matrix_distances.fillna(0)
 percentage_distances = matrix_distances.set_index('fid')
 percentage_distances = percentage_distances.div(percentage_distances.sum(axis=1), axis=0)
 percentage_distances.reset_index(inplace=True)
-
 df_grouped['fid'] = df_grouped['fid'].astype(str)
 df_grouped = pd.merge(df_grouped, percentage_distances, left_on='fid', right_on='fid', how='left')
 
+# Switch Tile variable to boolean
+dummies_tile = pd.get_dummies(df_grouped['tile'], prefix='tile')
+df_grouped = pd.merge(df_grouped, dummies_tile, how='left', left_index=True, right_index=True)
+df_grouped.drop('tile', axis=1, inplace=True)
+
+# Standard Scaler
+scaled_df = df_grouped.copy()
+col_names = df_grouped.columns[4:]
+features = scaled_df[col_names]
+scaler = StandardScaler().fit(features.values)
+features = scaler.transform(features.values)
+scaled_df[col_names] = features
+
+
 # Separate between train and test
-train = df_grouped.loc[df_grouped.label != 0]
-test = df_grouped.loc[df_grouped.label == 0]
+train = scaled_df.loc[scaled_df.label != 0]
+test = scaled_df.loc[scaled_df.label == 0]
 
 # 2. ML Model
 # Training set is the values of the pixels (from column 5 onwards), whereas label is the column 'label'.
