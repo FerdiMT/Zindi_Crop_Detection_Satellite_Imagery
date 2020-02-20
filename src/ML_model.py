@@ -12,6 +12,15 @@ df = pd.read_csv('data/sampled_data.csv')
 # Group into fields and create the mean of the pixels
 df_grouped = df.groupby('fid').mean().reset_index()
 
+# We also create the STD of the fields
+df_grouped_std = df.groupby('fid').std().reset_index()
+df_grouped_std.drop(['label', 'row_loc', 'col_loc', 'tile'], axis=1, inplace=True)
+df_grouped_std = df_grouped_std.fillna(0)
+
+# We merge them
+df_grouped = pd.merge(df_grouped, df_grouped_std, left_on='fid', right_on='fid', suffixes=['mean', 'std'])
+
+
 # Neighbourhood Algorithm: Detect which label have the fields next to each field
 # (the closest fields based on a threshold).
 matrix_distances = neighbourhood_algorithm(df=df_grouped,
