@@ -14,3 +14,4 @@ https://zindi.africa/competitions/iclr-workshop-challenge-2-radiant-earth-comput
 | id_4   | ML-XGB-Neighbourhood in percentages | Put the results of neighbourhood algorithm in percentages (by rows) | 1.2286      |                                                              |
 | id_4.1 | ML-RandomForest                     | Same but RF number estimators 500                            | 1.2276      |                                                              |
 | id_5   | ML-Adding STD of the pixels on the fields as features|Double the features, but does not improve results  | 1.2416      | Maybe create just a feature of "surface" or "number of pixels"                                                         |
+| id_6   | ML-Adding size of the fields (number of pixels) as feature| | 1.2286      |  |
