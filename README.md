@@ -12,3 +12,4 @@ https://zindi.africa/competitions/iclr-workshop-challenge-2-radiant-earth-comput
 | id_3   | ML-Neighbourhood Algorithm XGB      |                                                              | 1.2554      |                                                              |
 | id_3.1 | ML- XGB                             | No neighbourhood algo                                        | 1.2800      |                                                              |
 | id_4   | ML-XGB-Neighbourhood in percentages | Put the results of neighbourhood algorithm in percentages (by rows) | 1.2286      |                                                              |
+| id_4.1 | ML-RandomForest                     | Same but RF number estimators 500                            | 1.2276      |                                                              |
