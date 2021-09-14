@@ -1,4 +1,7 @@
 # Zindi_Radiant Earth Computer Vision for Crop Detection from Satellite Imagery
+
+Quick models to participate in the computer vision crop recognition challenge by Zindi.
+
 https://zindi.africa/competitions/iclr-workshop-challenge-2-radiant-earth-computer-vision-for-crop-recognition
 
 #### Changelog:
